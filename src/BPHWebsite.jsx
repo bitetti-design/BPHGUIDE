@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from “react”;
+import { useState, useEffect, useCallback } from "react";
 
 /* ─────────────────────────────────────────────
 TREATMENTS DATA — 16 entries across 5 categories

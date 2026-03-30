@@ -8,6 +8,9 @@ const treatments = [
   {
     id: 1, category: "Watchful Waiting", color: "#4A90A4", icon: "👁️",
     name: "Active Surveillance",
+    pivotalEfficacy: "N/A — no intervention",
+    physicianIncentive: 1,
+    incentiveNote: "Office visit only",
     description: "For mild symptoms, regular monitoring without immediate treatment. Lifestyle changes like reducing fluid intake before bed and limiting caffeine can help manage symptoms.",
     pros: ["No side effects", "No recovery time", "Low cost", "Preserves all future options"],
     cons: ["Symptoms may worsen over time", "Requires regular check-ins", "No immediate relief"],
@@ -27,6 +30,9 @@ const treatments = [
   {
     id: 2, category: "Medication", color: "#5B8DB8", icon: "💊",
     name: "Alpha Blockers",
+    pivotalEfficacy: "IPSS –39% (MTOPS)",
+    physicianIncentive: 1,
+    incentiveNote: "Prescription only — no procedure fee",
     description: "Drugs like tamsulosin (Flomax), alfuzosin, or silodosin relax the muscles in the prostate and bladder neck, making it easier to urinate. Effects are felt within days.",
     pros: ["Fast-acting (days to weeks)", "Well-studied", "Widely available", "Reversible"],
     cons: ["Daily pill required", "Can cause dizziness/low blood pressure", "Does not shrink prostate", "May affect ejaculation"],
@@ -46,6 +52,9 @@ const treatments = [
   {
     id: 3, category: "Medication", color: "#5B8DB8", icon: "💊",
     name: "5-Alpha Reductase Inhibitors",
+    pivotalEfficacy: "IPSS –6.3 pts; prostate volume –25% (MTOPS)",
+    physicianIncentive: 1,
+    incentiveNote: "Prescription only — no procedure fee",
     description: "Finasteride (Proscar) or dutasteride (Avodart) actually shrink the prostate over time by blocking the hormone that causes prostate growth. Takes 3–6 months to see full effect.",
     pros: ["Actually shrinks the prostate", "Reduces risk of acute urinary retention", "Can be combined with alpha blockers"],
     cons: ["Slow onset (3–6 months)", "Can cause sexual side effects (erectile dysfunction, decreased libido)", "Daily pill required", "Must continue indefinitely"],
@@ -65,6 +74,9 @@ const treatments = [
   {
     id: 4, category: "Medication", color: "#5B8DB8", icon: "💊",
     name: "Combination Drug Therapy",
+    pivotalEfficacy: "IPSS –6.3 pts at 4 yrs (CombAT)",
+    physicianIncentive: 1,
+    incentiveNote: "Prescription only — no procedure fee",
     description: "Using an alpha blocker and a 5-ARI together. The alpha blocker provides quick symptom relief while the 5-ARI works to shrink the prostate over months.",
     pros: ["Most effective medical therapy", "Both quick relief and long-term shrinkage", "Reduces need for surgery"],
     cons: ["Two daily pills", "Combined side effects of both drugs", "Higher cost", "Long-term commitment"],
@@ -84,6 +96,9 @@ const treatments = [
   {
     id: 5, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "UroLift (Prostatic Urethral Lift)",
+    pivotalEfficacy: "IPSS –36%; Qmax +44% (L.I.F.T.)",
+    physicianIncentive: 5,
+    incentiveNote: "~$3,500+ per case in-office (per-implant billing)",
     description: "Small implants are inserted to hold the enlarged prostate lobes out of the way — like pulling curtains apart. No cutting or heating of prostate tissue. Done in-office under local anesthesia.",
     pros: ["Preserves sexual function", "Fast recovery (days)", "No catheter needed usually", "In-office procedure"],
     cons: ["Not ideal for very large prostates", "Less durable than TURP", "May not cover all urinary symptoms", "Higher retreatment rate"],
@@ -104,6 +119,9 @@ const treatments = [
   {
     id: 6, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "Rezūm Water Vapor Therapy",
+    pivotalEfficacy: "IPSS –47%; Qmax +53% (Rezūm II)",
+    physicianIncentive: 3,
+    incentiveNote: "~$1,200–1,600 surgeon fee (outpatient)",
     description: "Steam (water vapor) is injected into the prostate to destroy excess tissue. The body then naturally absorbs the dead tissue over weeks. Takes 2–3 months for full effect.",
     pros: ["Preserves sexual function", "Quick outpatient procedure (~10 min)", "Durable results at 5 years", "Works on median lobe"],
     cons: ["Temporary catheter required (3–7 days)", "Full results take 2–3 months", "Urinary symptoms may worsen initially", "Not suited for very large prostates"],
@@ -123,6 +141,9 @@ const treatments = [
   {
     id: 7, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "Aquablation (Robotic Waterjet)",
+    pivotalEfficacy: "IPSS –47%; Qmax +49% (WATER); sustained 5 yrs",
+    physicianIncentive: 3,
+    incentiveNote: "~$1,800–2,500 surgeon fee (hospital-based)",
     description: "An AI-guided robotic system uses a high-pressure waterjet to precisely remove prostate tissue. The surgeon plans the resection zone using real-time ultrasound, then the robot executes it. Works on all prostate sizes including very large glands (>100g).",
     pros: ["AI-guided precision — reproducible results", "Works on any prostate size (20g to 300g+)", "Strong symptom relief across all sizes", "Low rates of erectile dysfunction (<1%) and incontinence (<1%)"],
     cons: ["Requires general anesthesia & hospital stay", "Temporary catheter (1–3 days)", "Risk of post-op bleeding requiring transfusion", "Not yet as widely available as TURP"],
@@ -143,6 +164,9 @@ const treatments = [
   {
     id: 8, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "GreenLight Laser (PVP)",
+    pivotalEfficacy: "Non-inferior to TURP for IPSS & Qmax (GOLIATH)",
+    physicianIncentive: 3,
+    incentiveNote: "~$1,500–2,200 surgeon fee",
     description: "A high-powered laser vaporizes excess prostate tissue. Similar outcomes to TURP but with less bleeding risk. Can be done outpatient in some cases.",
     pros: ["Less bleeding than TURP", "Good for patients on blood thinners", "Can be outpatient", "Effective for moderate-sized prostates"],
     cons: ["May cause retrograde ejaculation", "Tissue is vaporized — cannot be tested for cancer", "Catheter needed (1–3 days)", "Less proven for very large prostates"],
@@ -162,6 +186,9 @@ const treatments = [
   {
     id: 9, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "PAE (Prostatic Artery Embolization)",
+    pivotalEfficacy: "IPSS –47% at 12 mo (UK-ROPE)",
+    physicianIncentive: 4,
+    incentiveNote: "~$2,000–3,000 IR fee; performed by radiologists",
     description: "An interventional radiologist threads a catheter through the wrist or groin artery and injects tiny beads to block blood supply to the prostate, causing it to shrink over weeks.",
     pros: ["No incision in the prostate", "Preserves sexual function", "No general anesthesia needed", "Outpatient procedure"],
     cons: ["Performed by interventional radiologist, not urologist", "Less proven long-term data", "Results take weeks to months", "Higher retreatment rates than surgical options"],
@@ -181,6 +208,9 @@ const treatments = [
   {
     id: 10, category: "Surgery", color: "#C0392B", icon: "🏥",
     name: "TURP (Transurethral Resection)",
+    pivotalEfficacy: "IPSS –70%+; Qmax 8→20+ mL/s (gold standard)",
+    physicianIncentive: 2,
+    incentiveNote: "~$1,200–1,800 surgeon fee (hospital-based)",
     description: "The 'gold standard' for decades. A heated wire loop is used to carve away excess prostate tissue through the urethra. Highly effective but carries more side effects than newer options.",
     pros: ["Longest track record (60+ years)", "Highly effective symptom relief", "Works for most prostate sizes", "Covered by all insurers"],
     cons: ["Risk of retrograde ejaculation (65–75%)", "Catheter needed (2–3 days)", "Hospital stay (1–2 days)", "Risk of bleeding, infection, TUR syndrome"],
@@ -200,6 +230,9 @@ const treatments = [
   {
     id: 11, category: "Surgery", color: "#C0392B", icon: "🏥",
     name: "HoLEP (Holmium Laser Enucleation)",
+    pivotalEfficacy: "Non-inferior/superior to TURP; lowest retreatment (Kuntz)",
+    physicianIncentive: 3,
+    incentiveNote: "~$1,500–2,500 surgeon fee (hospital-based)",
     description: "A laser is used to scoop out the entire inner portion of the prostate (enucleation), then the tissue is morcellated and removed. The most complete tissue removal of any transurethral procedure.",
     pros: ["Most tissue removed — longest-lasting results", "Works for any size prostate", "Tissue can be checked for cancer", "Lower retreatment rate than TURP"],
     cons: ["Steep learning curve for surgeons", "Risk of retrograde ejaculation (75%+)", "Longer procedure time", "Limited availability — fewer surgeons trained"],
@@ -219,6 +252,9 @@ const treatments = [
   {
     id: 12, category: "Surgery", color: "#C0392B", icon: "🏥",
     name: "Simple Prostatectomy (Open/Robotic)",
+    pivotalEfficacy: "IPSS –75%+; lowest retreatment rate of any BPH procedure",
+    physicianIncentive: 4,
+    incentiveNote: "~$2,500–4,000 surgeon fee",
     description: "Surgical removal of the inner prostate through an abdominal incision (open) or robot-assisted laparoscopy. Reserved for the very largest prostates (>80–100g) where transurethral approaches may not suffice.",
     pros: ["Most complete tissue removal", "Highly durable results", "Robotic option reduces recovery time"],
     cons: ["Most invasive option", "Longest recovery (4–6 weeks)", "Hospital stay (2–3 days)", "Highest risk of side effects"],
@@ -238,6 +274,9 @@ const treatments = [
   {
     id: 13, category: "Supplements", color: "#7BA05B", icon: "🌿",
     name: "Saw Palmetto",
+    pivotalEfficacy: "No significant difference vs placebo (STEP)",
+    physicianIncentive: 1,
+    incentiveNote: "OTC supplement — no physician procedure",
     description: "The most studied herbal supplement for BPH. Extracted from the fruit of the American saw palmetto plant. Widely used in Europe. Evidence is mixed — some men report improvement.",
     pros: ["Available over-the-counter", "Generally well tolerated", "Low cost", "No prescription needed"],
     cons: ["Clinical evidence is mixed — may not be better than placebo", "Not FDA-regulated for quality", "Dosing varies widely between products"],
@@ -257,6 +296,9 @@ const treatments = [
   {
     id: 14, category: "Supplements", color: "#7BA05B", icon: "🌿",
     name: "Beta-Sitosterol",
+    pivotalEfficacy: "IPSS –4.9 pts; Qmax +3.9 mL/s (Cochrane)",
+    physicianIncentive: 1,
+    incentiveNote: "OTC supplement — no physician procedure",
     description: "A plant sterol found in foods like avocados, nuts, and seeds. Some studies suggest it can improve urinary flow and reduce residual urine volume.",
     pros: ["Natural compound found in foods", "Some clinical evidence of benefit", "Well tolerated"],
     cons: ["Limited long-term data", "Not FDA-regulated", "Effect size is modest"],
@@ -276,6 +318,9 @@ const treatments = [
   {
     id: 15, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "iTind (Temporary Implant)",
+    pivotalEfficacy: "IPSS –47%; Qmax +55% at 3 yrs (Porpiglia)",
+    physicianIncentive: 2,
+    incentiveNote: "~$1,000–1,500 surgeon fee",
     description: "A temporary implant is placed in the prostate for 5–7 days to reshape the tissue, then removed. No permanent implant left behind.",
     pros: ["No permanent implant", "Preserves sexual function", "Quick in-office procedure", "No tissue destruction"],
     cons: ["Newer procedure — less long-term data", "Temporary discomfort during implant period", "Limited availability", "Not for large prostates"],
@@ -295,6 +340,9 @@ const treatments = [
   {
     id: 16, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
     name: "WVTT (Optilume BPH)",
+    pivotalEfficacy: "IPSS –44% at 2 yrs (PINNACLE)",
+    physicianIncentive: 2,
+    incentiveNote: "~$1,000–1,500 (estimated, new procedure)",
     description: "A drug-coated balloon is inflated inside the prostate urethra to mechanically open the channel and deliver medication to prevent tissue regrowth. Office-based procedure.",
     pros: ["No implant or tissue removal", "Office-based", "Quick recovery", "Preserves sexual function"],
     cons: ["Newest BPH option — limited long-term data", "Not widely available yet", "Moderate symptom improvement"],
@@ -764,7 +812,7 @@ export default function BPHWebsite() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ background: "#F9FAFB" }}>
-                      {["Treatment", "Category", "Effectiveness", "Invasiveness", "Recovery", "Sexual Side Effects"].map(h => (
+                      {["Treatment", "Category", "Pivotal Trial Efficacy", "Invasiveness", "Recovery", "Sexual Side Effects", "Physician Incentive"].map(h => (
                         <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#374151", borderBottom: "1px solid #E5E7EB", whiteSpace: "nowrap" }}>{h}</th>
                       ))}
                     </tr>
@@ -776,7 +824,7 @@ export default function BPHWebsite() {
                         <td style={{ padding: "10px 16px" }}>
                           <span className="badge" style={{ background: categoryColors[t.category].bg, color: categoryColors[t.category].badge }}>{t.category}</span>
                         </td>
-                        <td style={{ padding: "10px 16px", color: categoryColors[t.category].badge }}>{"●".repeat(t.effectiveness)}{"○".repeat(5 - t.effectiveness)}</td>
+                        <td style={{ padding: "10px 16px", color: "#374151", fontSize: 12, maxWidth: 220 }}>{t.pivotalEfficacy}</td>
                         <td style={{ padding: "10px 16px", color: "#EF4444" }}>{"●".repeat(t.invasiveness)}{"○".repeat(5 - t.invasiveness)}</td>
                         <td style={{ padding: "10px 16px", color: "#374151" }}>{t.recovery}</td>
                         <td style={{ padding: "10px 16px", color: "#374151" }}>
@@ -785,10 +833,18 @@ export default function BPHWebsite() {
                            t.name === "Aquablation (Robotic Waterjet)" ? "Very Low (<1% ED, <1% incontinence)" :
                            "Low — generally preserved"}
                         </td>
+                        <td style={{ padding: "10px 16px" }} title={t.incentiveNote}>
+                          <span style={{ color: t.physicianIncentive >= 4 ? "#DC2626" : t.physicianIncentive >= 3 ? "#D97706" : "#059669" }}>
+                            {"$".repeat(t.physicianIncentive)}{"○".repeat(5 - t.physicianIncentive)}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div style={{ padding: "12px 28px 20px", borderTop: "1px solid #F3F4F6", fontSize: 11, color: "#9CA3AF", lineHeight: 1.6 }}>
+                <strong>Physician Incentive Scale:</strong> $ = minimal (office visit/Rx only) · $$$$$ = highest per-procedure reimbursement. Based on 2026 Medicare physician fee schedules across ASC, HOPD, and office settings. Higher incentive does not imply improper motives — it means patients should ask their doctor to explain why a particular procedure is recommended for their specific situation. Hover over the symbols for details.
               </div>
             </div>
           </div>

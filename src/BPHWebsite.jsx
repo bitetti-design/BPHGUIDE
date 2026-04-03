@@ -1034,78 +1034,23 @@ export default function BPHWebsite() {
             {/* Review Form */}
             {showForm && (
               <div style={{ background: "white", borderRadius: 16, border: "1.5px solid #E5E7EB", padding: 28, marginBottom: 28 }}>
-                <h3 style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 22, margin: "0 0 20px", color: "#1E3A5F" }}>Share Your BPH Treatment Experience</h3>
-
-                {formErrors.general && <p style={{ color: "#DC2626", fontSize: 13, marginBottom: 12 }}>{formErrors.general}</p>}
-
-                {/* Honeypot — invisible to humans */}
-                <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
-                  <input type="text" tabIndex={-1} autoComplete="off" value={form.honeypot}
-                    onChange={e => setForm({ ...form, honeypot: e.target.value })} />
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                  <div>
-                    <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Name (or initials) *</label>
-                    <input className="input-field" placeholder="e.g. Robert M." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                    {formErrors.name && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.name}</p>}
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Age</label>
-                    <input className="input-field" type="number" placeholder="Optional" value={form.age} onChange={e => setForm({ ...form, age: e.target.value })} />
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Treatment *</label>
-                  <select className="input-field" value={form.treatment} onChange={e => setForm({ ...form, treatment: e.target.value })} style={{ cursor: "pointer" }}>
-                    <option value="">Select a treatment...</option>
-                    {treatments.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
-                  </select>
-                  {formErrors.treatment && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.treatment}</p>}
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                  <div>
-                    <StarRating value={form.rating} onChange={v => setForm({ ...form, rating: v })} label="Overall *" />
-                    {formErrors.rating && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.rating}</p>}
-                  </div>
-                  <StarRating value={form.recovery} onChange={v => setForm({ ...form, recovery: v })} label="Recovery" />
-                  <StarRating value={form.sideEffects} onChange={v => setForm({ ...form, sideEffects: v })} label="Side Effects" />
-                </div>
-
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Would you recommend this treatment? *</label>
-                  <div style={{ display: "flex", gap: 12 }}>
-                    {["yes", "no", "maybe"].map(opt => (
-                      <button key={opt} onClick={() => setForm({ ...form, wouldRecommend: opt })}
-                        style={{ padding: "8px 20px", borderRadius: 8, border: `1.5px solid ${form.wouldRecommend === opt ? "#1E3A5F" : "#E5E7EB"}`, background: form.wouldRecommend === opt ? "#1E3A5F" : "white", color: form.wouldRecommend === opt ? "white" : "#4B5563", cursor: "pointer", fontSize: 13, fontWeight: 600, textTransform: "capitalize", transition: "all 0.2s" }}>
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                  {formErrors.wouldRecommend && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.wouldRecommend}</p>}
-                </div>
-
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Your Experience *</label>
-                  <textarea className="input-field" rows={5} placeholder="Tell other patients about your experience — what went well, what was difficult, what you wish you had known..."
-                    value={form.text} onChange={e => setForm({ ...form, text: e.target.value })}
-                    style={{ resize: "vertical", minHeight: 120 }} />
-                  {formErrors.text && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.text}</p>}
-                </div>
-
-                {/* CAPTCHA */}
-                <div style={{ marginBottom: 20, background: "#F9FAFB", borderRadius: 10, padding: 16, border: "1px solid #E5E7EB" }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Quick verification: What is {captcha.question}? *</label>
-                  <input className="input-field" type="number" placeholder="Your answer" value={captchaInput} onChange={e => setCaptchaInput(e.target.value)} style={{ maxWidth: 160 }} />
-                  {formErrors.captcha && <p style={{ color: "#DC2626", fontSize: 12, margin: "4px 0 0" }}>{formErrors.captcha}</p>}
-                </div>
-
-                <div style={{ display: "flex", gap: 12 }}>
-                  <button className="btn-primary" onClick={handleSubmit} disabled={submitting}>{submitting ? "Submitting..." : "Submit Review"}</button>
-                  <button className="btn-outline" onClick={() => setShowForm(false)}>Cancel</button>
-                </div>
+                <StructuredReviewForm
+                  onClose={() => setShowForm(false)}
+                  onSuccess={() => {
+                    setSubmitted(true);
+                    setShowForm(false);
+                    // Reload reviews from database
+                    supabaseFetch("reviews?select=*&order=created_at.desc").then(data => {
+                      if (Array.isArray(data) && data.length > 0) {
+                        setReviews(data.map(r => ({
+                          id: r.id, treatment: r.treatment, name: r.name, age: r.age,
+                          date: r.display_date, rating: r.rating, recovery: r.recovery,
+                          sideEffects: r.side_effects, wouldRecommend: r.would_recommend, text: r.review_text,
+                        })));
+                      }
+                    });
+                  }}
+                />
               </div>
             )}
 
@@ -1190,4 +1135,3 @@ export default function BPHWebsite() {
     </div>
   );
 }
-

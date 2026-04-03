@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 
 /* ─────────────────────────────────────────────
-   TREATMENTS DATA — 16 entries across 5 categories
-   Updated March 2026 with latest PROCEPT Analyst Day data
+   TREATMENTS DATA — 18 entries across 5 categories
+   Updated April 2026 — includes TUIP and PDE-5 inhibitor
+   Prostate anatomy suitability data added per Reddit feedback
    ───────────────────────────────────────────── */
 const treatments = [
   {
@@ -11,6 +12,9 @@ const treatments = [
     pivotalEfficacy: "N/A — no intervention",
     physicianIncentive: 1,
     incentiveNote: "Office visit only",
+    fdaApproved: "N/A",
+    prostateSize: "Any size",
+    medianLobe: "N/A",
     description: "For mild symptoms, regular monitoring without immediate treatment. Lifestyle changes like reducing fluid intake before bed and limiting caffeine can help manage symptoms.",
     pros: ["No side effects", "No recovery time", "Low cost", "Preserves all future options"],
     cons: ["Symptoms may worsen over time", "Requires regular check-ins", "No immediate relief"],
@@ -33,9 +37,12 @@ const treatments = [
     pivotalEfficacy: "IPSS –39% (MTOPS)",
     physicianIncentive: 1,
     incentiveNote: "Prescription only — no procedure fee",
+    fdaApproved: "1988 (tamsulosin)",
+    prostateSize: "Any size",
+    medianLobe: "N/A — medication",
     description: "Drugs like tamsulosin (Flomax), alfuzosin, or silodosin relax the muscles in the prostate and bladder neck, making it easier to urinate. Effects are felt within days.",
     pros: ["Fast-acting (days to weeks)", "Well-studied", "Widely available", "Reversible"],
-    cons: ["Daily pill required", "Can cause dizziness/low blood pressure", "Does not shrink prostate", "May affect ejaculation"],
+    cons: ["Daily pill required", "Can cause dizziness/low blood pressure", "Does not shrink prostate", "Ejaculatory dysfunction: tamsulosin 8–26% (dose-dependent); silodosin ~28%; alfuzosin <1.5%"],
     idealFor: "Most men with moderate symptoms as a first-line treatment.",
     invasiveness: 0, effectiveness: 3, recovery: "None",
     physicianFee: "~$10–40/month (generic tamsulosin)",
@@ -55,6 +62,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –6.3 pts; prostate volume –25% (MTOPS)",
     physicianIncentive: 1,
     incentiveNote: "Prescription only — no procedure fee",
+    fdaApproved: "1992 (finasteride)",
+    prostateSize: "Best >40 mL (larger prostates respond better)",
+    medianLobe: "N/A — medication",
     description: "Finasteride (Proscar) or dutasteride (Avodart) actually shrink the prostate over time by blocking the hormone that causes prostate growth. Takes 3–6 months to see full effect.",
     pros: ["Actually shrinks the prostate", "Reduces risk of acute urinary retention", "Can be combined with alpha blockers"],
     cons: ["Slow onset (3–6 months)", "Can cause sexual side effects (erectile dysfunction, decreased libido)", "Daily pill required", "Must continue indefinitely"],
@@ -77,6 +87,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –6.3 pts at 4 yrs (CombAT)",
     physicianIncentive: 1,
     incentiveNote: "Prescription only — no procedure fee",
+    fdaApproved: "N/A — combination Rx",
+    prostateSize: "Best >30–40 mL",
+    medianLobe: "N/A — medication",
     description: "Using an alpha blocker and a 5-ARI together. The alpha blocker provides quick symptom relief while the 5-ARI works to shrink the prostate over months.",
     pros: ["Most effective medical therapy", "Both quick relief and long-term shrinkage", "Reduces need for surgery"],
     cons: ["Two daily pills", "Combined side effects of both drugs", "Higher cost", "Long-term commitment"],
@@ -99,6 +112,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –36%; Qmax +44% (L.I.F.T.)",
     physicianIncentive: 5,
     incentiveNote: "~$3,500+ per case in-office (per-implant billing)",
+    fdaApproved: "2013",
+    prostateSize: "30–80 mL only",
+    medianLobe: "No — median lobe EXCLUDED from L.I.F.T. trial and FDA clearance",
     description: "Small implants are inserted to hold the enlarged prostate lobes out of the way — like pulling curtains apart. No cutting or heating of prostate tissue. Done in-office under local anesthesia.",
     pros: ["Preserves sexual function", "Fast recovery (days)", "No catheter needed usually", "In-office procedure"],
     cons: ["Not ideal for very large prostates", "Less durable than TURP", "May not cover all urinary symptoms", "Higher retreatment rate"],
@@ -122,9 +138,12 @@ const treatments = [
     pivotalEfficacy: "IPSS –47%; Qmax +53% (Rezūm II)",
     physicianIncentive: 3,
     incentiveNote: "~$1,200–1,600 surgeon fee (outpatient)",
+    fdaApproved: "2015",
+    prostateSize: "30–80 mL (FDA indication)",
+    medianLobe: "Yes — indicated for median lobe treatment",
     description: "Steam (water vapor) is injected into the prostate to destroy excess tissue. The body then naturally absorbs the dead tissue over weeks. Takes 2–3 months for full effect.",
     pros: ["Preserves sexual function", "Quick outpatient procedure (~10 min)", "Durable results at 5 years", "Works on median lobe"],
-    cons: ["Temporary catheter required (3–7 days)", "Full results take 2–3 months", "Urinary symptoms may worsen initially", "Not suited for very large prostates"],
+    cons: ["Temporary catheter required (3–7 days)", "Full results take 2–3 months", "Urinary symptoms may worsen initially", "Not suited for very large prostates", "Retrograde ejaculation ~3–5% (systematic review of 16 studies, n=1,703)"],
     idealFor: "Men with moderate symptoms who want to preserve sexual function and avoid daily medication.",
     invasiveness: 2, effectiveness: 4, recovery: "1–3 weeks",
     physicianFee: "~$1,200–1,600 (surgeon fee, outpatient facility)",
@@ -139,11 +158,14 @@ const treatments = [
     ],
   },
   {
-    id: 7, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
+    id: 7, category: "Surgery", color: "#C0392B", icon: "🤖",
     name: "Aquablation (Robotic Waterjet)",
     pivotalEfficacy: "IPSS –47%; Qmax +49% (WATER); sustained 5 yrs",
     physicianIncentive: 3,
     incentiveNote: "~$1,800–2,500 surgeon fee (hospital-based)",
+    fdaApproved: "2017 (De Novo); CPT 52597 effective Jan 2026",
+    prostateSize: "20–150 mL (WATER); no upper limit in practice (>300 mL treated)",
+    medianLobe: "Yes — treats median lobe; key differentiator vs UroLift",
     description: "An AI-guided robotic system uses a high-pressure waterjet to precisely remove prostate tissue. The surgeon plans the resection zone using real-time ultrasound, then the robot executes it. Works on all prostate sizes including very large glands (>100g).",
     pros: ["AI-guided precision — reproducible results", "Works on any prostate size (20g to 300g+)", "Strong symptom relief across all sizes", "Low rates of erectile dysfunction (<1%) and incontinence (<1%)"],
     cons: ["Requires general anesthesia & hospital stay", "Temporary catheter (1–3 days)", "Risk of post-op bleeding requiring transfusion", "Not yet as widely available as TURP"],
@@ -152,7 +174,7 @@ const treatments = [
     physicianFee: "~$1,800–2,500 (surgeon fee, hospital-based)",
     feeNote: "Category I CPT reimbursement as of January 1, 2026. Handpiece (single-use) pricing is ~$3,500 per procedure. System is capital equipment placed at the hospital.",
     seminalTrial: "WATER Trial — Gilling et al., J Urology 2019; WATER II — Bhojani et al., 2022",
-    trialUrl: "https://pubmed.ncbi.nlm.nih.gov/30016230/",
+    trialUrl: "https://pubmed.ncbi.nlm.nih.gov/29694702/",
     efficacyData: "Meta-analysis of 18 publications + PROCEPT 2026 data: IPSS drops from severe (20–35) to mild (0–7) range maintained through 5 years. Qmax improvement sustained. Across >125,000 procedures performed worldwide: <1% incontinence, <1% erectile dysfunction. Re-operation-free rate is among the best of all BPH procedures at 5+ years (comparable to HoLEP). Now the leading modern resective BPH treatment — second only to TURP in total volume.",
     maudeUrl: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfmaude/search.cfm",
     maudeNote: "Search 'AQUABEAM' or 'Aquablation' in the FDA MAUDE database. Over 125,000 patients treated worldwide across 900+ installed systems.",
@@ -162,11 +184,14 @@ const treatments = [
     ],
   },
   {
-    id: 8, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
+    id: 8, category: "Surgery", color: "#C0392B", icon: "🏥",
     name: "GreenLight Laser (PVP)",
     pivotalEfficacy: "Non-inferior to TURP for IPSS & Qmax (GOLIATH)",
     physicianIncentive: 3,
     incentiveNote: "~$1,500–2,200 surgeon fee",
+    fdaApproved: "2002 (GreenLight XPS)",
+    prostateSize: "Any size (longer procedure time for larger)",
+    medianLobe: "Yes",
     description: "A high-powered laser vaporizes excess prostate tissue. Similar outcomes to TURP but with less bleeding risk. Can be done outpatient in some cases.",
     pros: ["Less bleeding than TURP", "Good for patients on blood thinners", "Can be outpatient", "Effective for moderate-sized prostates"],
     cons: ["May cause retrograde ejaculation", "Tissue is vaporized — cannot be tested for cancer", "Catheter needed (1–3 days)", "Less proven for very large prostates"],
@@ -189,6 +214,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –47% at 12 mo (UK-ROPE)",
     physicianIncentive: 4,
     incentiveNote: "~$2,000–3,000 IR fee; performed by radiologists",
+    fdaApproved: "Not FDA-cleared as device (uses standard embolic agents)",
+    prostateSize: "40–200+ mL",
+    medianLobe: "Yes — particularly effective for very large glands",
     description: "An interventional radiologist threads a catheter through the wrist or groin artery and injects tiny beads to block blood supply to the prostate, causing it to shrink over weeks.",
     pros: ["No incision in the prostate", "Preserves sexual function", "No general anesthesia needed", "Outpatient procedure"],
     cons: ["Performed by interventional radiologist, not urologist", "Less proven long-term data", "Results take weeks to months", "Higher retreatment rates than surgical options"],
@@ -211,6 +239,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –70%+; Qmax 8→20+ mL/s (gold standard)",
     physicianIncentive: 2,
     incentiveNote: "~$1,200–1,800 surgeon fee (hospital-based)",
+    fdaApproved: "1960s (predates modern FDA device clearance)",
+    prostateSize: "<80 mL typical; can treat larger",
+    medianLobe: "Yes",
     description: "The 'gold standard' for decades. A heated wire loop is used to carve away excess prostate tissue through the urethra. Highly effective but carries more side effects than newer options.",
     pros: ["Longest track record (60+ years)", "Highly effective symptom relief", "Works for most prostate sizes", "Covered by all insurers"],
     cons: ["Risk of retrograde ejaculation (65–75%)", "Catheter needed (2–3 days)", "Hospital stay (1–2 days)", "Risk of bleeding, infection, TUR syndrome"],
@@ -233,6 +264,9 @@ const treatments = [
     pivotalEfficacy: "Non-inferior/superior to TURP; lowest retreatment (Kuntz)",
     physicianIncentive: 3,
     incentiveNote: "~$1,500–2,500 surgeon fee (hospital-based)",
+    fdaApproved: "1998 (Holmium laser)",
+    prostateSize: "Any size — size-independent; gold standard for >80 mL",
+    medianLobe: "Yes",
     description: "A laser is used to scoop out the entire inner portion of the prostate (enucleation), then the tissue is morcellated and removed. The most complete tissue removal of any transurethral procedure.",
     pros: ["Most tissue removed — longest-lasting results", "Works for any size prostate", "Tissue can be checked for cancer", "Lower retreatment rate than TURP"],
     cons: ["Steep learning curve for surgeons", "Risk of retrograde ejaculation (75%+)", "Longer procedure time", "Limited availability — fewer surgeons trained"],
@@ -255,6 +289,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –75%+; lowest retreatment rate of any BPH procedure",
     physicianIncentive: 4,
     incentiveNote: "~$2,500–4,000 surgeon fee",
+    fdaApproved: "N/A — standard surgical procedure",
+    prostateSize: "Best for >80–100 mL",
+    medianLobe: "Yes",
     description: "Surgical removal of the inner prostate through an abdominal incision (open) or robot-assisted laparoscopy. Reserved for the very largest prostates (>80–100g) where transurethral approaches may not suffice.",
     pros: ["Most complete tissue removal", "Highly durable results", "Robotic option reduces recovery time"],
     cons: ["Most invasive option", "Longest recovery (4–6 weeks)", "Hospital stay (2–3 days)", "Highest risk of side effects"],
@@ -277,6 +314,9 @@ const treatments = [
     pivotalEfficacy: "No significant difference vs placebo (STEP)",
     physicianIncentive: 1,
     incentiveNote: "OTC supplement — no physician procedure",
+    fdaApproved: "N/A — dietary supplement (not FDA-regulated)",
+    prostateSize: "Any size (mild symptoms only)",
+    medianLobe: "N/A — supplement",
     description: "The most studied herbal supplement for BPH. Extracted from the fruit of the American saw palmetto plant. Widely used in Europe. Evidence is mixed — some men report improvement.",
     pros: ["Available over-the-counter", "Generally well tolerated", "Low cost", "No prescription needed"],
     cons: ["Clinical evidence is mixed — may not be better than placebo", "Not FDA-regulated for quality", "Dosing varies widely between products"],
@@ -299,6 +339,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –4.9 pts; Qmax +3.9 mL/s (Cochrane)",
     physicianIncentive: 1,
     incentiveNote: "OTC supplement — no physician procedure",
+    fdaApproved: "N/A — dietary supplement (not FDA-regulated)",
+    prostateSize: "Any size (mild symptoms only)",
+    medianLobe: "N/A — supplement",
     description: "A plant sterol found in foods like avocados, nuts, and seeds. Some studies suggest it can improve urinary flow and reduce residual urine volume.",
     pros: ["Natural compound found in foods", "Some clinical evidence of benefit", "Well tolerated"],
     cons: ["Limited long-term data", "Not FDA-regulated", "Effect size is modest"],
@@ -321,6 +364,9 @@ const treatments = [
     pivotalEfficacy: "IPSS –47%; Qmax +55% at 3 yrs (Porpiglia)",
     physicianIncentive: 2,
     incentiveNote: "~$1,000–1,500 surgeon fee",
+    fdaApproved: "2020",
+    prostateSize: "25–75 mL",
+    medianLobe: "Limited data — generally excluded",
     description: "A temporary implant is placed in the prostate for 5–7 days to reshape the tissue, then removed. No permanent implant left behind.",
     pros: ["No permanent implant", "Preserves sexual function", "Quick in-office procedure", "No tissue destruction"],
     cons: ["Newer procedure — less long-term data", "Temporary discomfort during implant period", "Limited availability", "Not for large prostates"],
@@ -339,10 +385,13 @@ const treatments = [
   },
   {
     id: 16, category: "Minimally Invasive", color: "#6B7FD7", icon: "🔬",
-    name: "WVTT (Optilume BPH)",
+    name: "Optilume BPH (Drug-Coated Balloon)",
     pivotalEfficacy: "IPSS –44% at 2 yrs (PINNACLE)",
     physicianIncentive: 2,
     incentiveNote: "~$1,000–1,500 (estimated, new procedure)",
+    fdaApproved: "2021 (De Novo)",
+    prostateSize: "30–80 mL (PINNACLE enrollment)",
+    medianLobe: "Yes — treats bladder neck/median lobe area",
     description: "A drug-coated balloon is inflated inside the prostate urethra to mechanically open the channel and deliver medication to prevent tissue regrowth. Office-based procedure.",
     pros: ["No implant or tissue removal", "Office-based", "Quick recovery", "Preserves sexual function"],
     cons: ["Newest BPH option — limited long-term data", "Not widely available yet", "Moderate symptom improvement"],
@@ -357,6 +406,56 @@ const treatments = [
     maudeNote: "Very new device. Limited MAUDE entries available.",
     videos: [
       { label: "Optilume BPH Procedure", url: "https://www.youtube.com/results?search_query=Optilume+BPH+drug+coated+balloon+procedure", source: "YouTube Search", isSearch: true },
+    ],
+  },
+  {
+    id: 17, category: "Surgery", color: "#C0392B", icon: "🏥",
+    name: "TUIP (Transurethral Incision)",
+    pivotalEfficacy: "IPSS 19→6; Qmax 8→17 mL/s (comparable to TURP for <30 mL)",
+    physicianIncentive: 2,
+    incentiveNote: "~$600–800 surgeon fee (facility-based)",
+    fdaApproved: "1980s (predates modern FDA device clearance)",
+    prostateSize: "<30 mL only",
+    medianLobe: "No — median lobe is an exclusion criterion",
+    description: "One or two small incisions are made in the prostate (at the 5 and 7 o'clock positions) to relax the muscle and relieve pressure on the urethra — no tissue is removed. A simpler, faster alternative to TURP for men with small prostates.",
+    pros: ["Shorter operative time than TURP (~20 min vs ~60 min)", "Lower retrograde ejaculation rate (~22% vs ~52% for TURP)", "Lower ED risk (~4% vs ~6% for TURP)", "Same-day discharge common", "Comparable symptom relief to TURP for small glands"],
+    cons: ["Only for small prostates (<30 mL)", "Higher retreatment rate than TURP (~18% vs ~7%)", "Does not remove tissue — cannot test for cancer", "Median lobe must be absent", "Less effective if prostate continues to grow"],
+    idealFor: "Men with small prostates (<30 mL) and no median lobe who want effective relief with lower sexual side effect risk than TURP.",
+    invasiveness: 3, effectiveness: 4, recovery: "1–2 weeks",
+    physicianFee: "~$600–800 (surgeon fee, CPT 52450)",
+    feeNote: "Lower reimbursement than TURP, reflecting the simpler procedure. Facility fees are additional.",
+    seminalTrial: "TUIP vs TURP long-term RCT — Yang et al., AFSJU 2012; AUA/EAU meta-analyses",
+    trialUrl: "https://pubmed.ncbi.nlm.nih.gov/26497341/",
+    efficacyData: "Multiple RCTs (n=80–86 per study, 4-yr follow-up): IPSS improved from 19 → 6.3 (comparable to TURP 19 → 5.8). Qmax from 8.4 → 16.6 mL/s. Retrograde ejaculation: TUIP 22.5% vs TURP 52.5%. ED: TUIP 7.5% vs TURP 20%. Operative time: TUIP ~20 min vs TURP ~60 min. Reoperation rate higher at ~18% vs ~7% for TURP (EAU/AUA meta-analysis of 10 RCTs).",
+    maudeUrl: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfmaude/search.cfm",
+    maudeNote: "TUIP uses standard resectoscopes/electrocautery. Search 'resectoscope' in MAUDE.",
+    videos: [
+      { label: "TUIP Procedure Explained", url: "https://www.youtube.com/results?search_query=TUIP+transurethral+incision+prostate+procedure+BPH", source: "YouTube Search", isSearch: true },
+    ],
+  },
+  {
+    id: 18, category: "Medication", color: "#5B8DB8", icon: "💊",
+    name: "PDE-5 Inhibitor (Tadalafil/Cialis 5mg)",
+    pivotalEfficacy: "IPSS –4.7 to –6.4 pts; Qmax not significantly improved vs placebo",
+    physicianIncentive: 1,
+    incentiveNote: "Prescription only — no procedure fee",
+    fdaApproved: "2011 (tadalafil 5mg daily for BPH/LUTS)",
+    prostateSize: "Any size (efficacy independent of prostate volume per pooled analysis)",
+    medianLobe: "N/A — medication",
+    description: "Tadalafil (Cialis) 5mg taken daily relaxes smooth muscle in the prostate, bladder neck, and blood vessels. Originally approved for erectile dysfunction, it was FDA-approved for BPH symptoms in 2011. The only BPH medication that also treats ED — two birds, one stone.",
+    pros: ["Simultaneously treats ED and BPH", "Comparable IPSS improvement to alpha blockers (~4–6 points)", "Once-daily pill", "No ejaculatory dysfunction", "Can be combined with alpha blockers for additional benefit"],
+    cons: ["Does not significantly improve urine flow rate (Qmax)", "Does not shrink the prostate", "Cannot use with nitrates (dangerous blood pressure drop)", "Headache and back pain are common side effects", "Brand-name Cialis is expensive; generic tadalafil is more affordable"],
+    idealFor: "Men with BPH symptoms AND erectile dysfunction — especially younger, sexually active men who want to address both with one medication.",
+    invasiveness: 0, effectiveness: 3, recovery: "None",
+    physicianFee: "~$10–30/month (generic tadalafil 5mg daily)",
+    feeNote: "Generic tadalafil is widely available. Brand Cialis is significantly more expensive. No procedural incentive.",
+    seminalTrial: "Porst et al., Eur Urol 2011; Pooled analysis of 4 RCTs (n=1,500)",
+    trialUrl: "https://pubmed.ncbi.nlm.nih.gov/21871706/",
+    efficacyData: "Pooled 4 RCTs (n=1,500): Tadalafil 5mg daily improved IPSS by –2.3 points vs placebo (p<0.001). Individual trials showed IPSS improvement of –4.7 to –6.4 points (comparable to tamsulosin). IIEF erectile function score improved by +5.5 vs placebo. No significant Qmax improvement. IPSS improvement seen regardless of baseline prostate volume (<40 or ≥40 mL), age, or testosterone level. Effect apparent within 1 week, significant by 4 weeks.",
+    maudeUrl: null,
+    maudeNote: "Oral medication. No MAUDE device entries applicable.",
+    videos: [
+      { label: "Tadalafil/Cialis for BPH Explained", url: "https://www.youtube.com/results?search_query=tadalafil+cialis+5mg+daily+BPH+enlarged+prostate+treatment", source: "YouTube Search", isSearch: true },
     ],
   },
 ];
@@ -677,8 +776,8 @@ export default function BPHWebsite() {
                 Clinical trial data. Physician reimbursement transparency. FDA adverse event reports. Real patient reviews. No sponsored content — ever.
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <span className="badge" style={{ background: "rgba(255,255,255,0.15)", color: "white", padding: "6px 14px", fontSize: 12, backdropFilter: "blur(4px)" }}>16 Treatments Covered</span>
-                <span className="badge" style={{ background: "rgba(255,255,255,0.15)", color: "white", padding: "6px 14px", fontSize: 12, backdropFilter: "blur(4px)" }}>Updated March 2026</span>
+                <span className="badge" style={{ background: "rgba(255,255,255,0.15)", color: "white", padding: "6px 14px", fontSize: 12, backdropFilter: "blur(4px)" }}>18 Treatments Covered</span>
+                <span className="badge" style={{ background: "rgba(255,255,255,0.15)", color: "white", padding: "6px 14px", fontSize: 12, backdropFilter: "blur(4px)" }}>Updated April 2026</span>
               </div>
             </div>
           </div>
@@ -780,6 +879,29 @@ export default function BPHWebsite() {
                           <p style={{ fontSize: 13, color: "#1E40AF", margin: 0, lineHeight: 1.5 }}>{t.idealFor}</p>
                         </div>
 
+                        {/* Prostate Anatomy Suitability */}
+                        {(t.prostateSize || t.medianLobe) && (
+                          <div style={{ background: "#FFF1F2", border: "1px solid #FECDD3", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: "#9F1239", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>🔬 Prostate Anatomy Suitability</p>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                              <div>
+                                <p style={{ fontSize: 11, color: "#9F1239", margin: "0 0 2px", fontWeight: 600 }}>Prostate Size</p>
+                                <p style={{ fontSize: 13, color: "#881337", margin: 0, lineHeight: 1.4 }}>{t.prostateSize || "—"}</p>
+                              </div>
+                              <div>
+                                <p style={{ fontSize: 11, color: "#9F1239", margin: "0 0 2px", fontWeight: 600 }}>Median Lobe Compatible?</p>
+                                <p style={{ fontSize: 13, margin: 0, lineHeight: 1.4, fontWeight: 600, color: t.medianLobe?.startsWith("Yes") ? "#059669" : t.medianLobe?.startsWith("No") ? "#DC2626" : "#881337" }}>
+                                  {t.medianLobe || "—"}
+                                </p>
+                              </div>
+                              <div>
+                                <p style={{ fontSize: 11, color: "#9F1239", margin: "0 0 2px", fontWeight: 600 }}>FDA Approved</p>
+                                <p style={{ fontSize: 13, color: "#881337", margin: 0, lineHeight: 1.4 }}>{t.fdaApproved || "—"}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Physician Fee */}
                         <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
                           <p style={{ fontSize: 12, fontWeight: 700, color: "#C2410C", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>💰 Physician Reimbursement</p>
@@ -840,7 +962,7 @@ export default function BPHWebsite() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ background: "#F9FAFB" }}>
-                      {["Treatment", "Category", "Pivotal Trial Efficacy", "Invasiveness", "Recovery", "Sexual Side Effects", "Physician Incentive"].map(h => (
+                      {["Treatment", "Category", "FDA Approved", "Prostate Size", "Median Lobe OK?", "Pivotal Trial Efficacy", "Invasiveness", "Recovery", "Physician Incentive"].map(h => (
                         <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#374151", borderBottom: "1px solid #E5E7EB", whiteSpace: "nowrap" }}>{h}</th>
                       ))}
                     </tr>
@@ -852,15 +974,16 @@ export default function BPHWebsite() {
                         <td style={{ padding: "10px 16px" }}>
                           <span className="badge" style={{ background: categoryColors[t.category].bg, color: categoryColors[t.category].badge }}>{t.category}</span>
                         </td>
+                        <td style={{ padding: "10px 16px", color: "#374151", fontSize: 12 }}>{t.fdaApproved || "—"}</td>
+                        <td style={{ padding: "10px 16px", color: "#374151", fontSize: 12, maxWidth: 160 }}>{t.prostateSize || "—"}</td>
+                        <td style={{ padding: "10px 16px", fontSize: 12 }}>
+                          <span style={{ color: t.medianLobe?.startsWith("Yes") ? "#059669" : t.medianLobe?.startsWith("No") ? "#DC2626" : "#6B7280", fontWeight: 600 }}>
+                            {t.medianLobe || "—"}
+                          </span>
+                        </td>
                         <td style={{ padding: "10px 16px", color: "#374151", fontSize: 12, maxWidth: 220 }}>{t.pivotalEfficacy}</td>
                         <td style={{ padding: "10px 16px", color: "#EF4444" }}>{"●".repeat(t.invasiveness)}{"○".repeat(5 - t.invasiveness)}</td>
                         <td style={{ padding: "10px 16px", color: "#374151" }}>{t.recovery}</td>
-                        <td style={{ padding: "10px 16px", color: "#374151" }}>
-                          {t.invasiveness === 0 ? "None / Minimal" :
-                           t.category === "Surgery" && t.name !== "Aquablation (Robotic Waterjet)" ? "High (retrograde ejaculation likely)" :
-                           t.name === "Aquablation (Robotic Waterjet)" ? "Very Low (<1% ED, <1% incontinence)" :
-                           "Low — generally preserved"}
-                        </td>
                         <td style={{ padding: "10px 16px" }} title={t.incentiveNote}>
                           <span style={{ color: t.physicianIncentive >= 4 ? "#DC2626" : t.physicianIncentive >= 3 ? "#D97706" : "#059669" }}>
                             {"$".repeat(t.physicianIncentive)}{"○".repeat(5 - t.physicianIncentive)}
@@ -872,7 +995,9 @@ export default function BPHWebsite() {
                 </table>
               </div>
               <div style={{ padding: "12px 28px 20px", borderTop: "1px solid #F3F4F6", fontSize: 11, color: "#9CA3AF", lineHeight: 1.6 }}>
-                <strong>Physician Incentive Scale:</strong> $ = minimal (office visit/Rx only) · $$$$$ = highest per-procedure reimbursement. Based on 2026 Medicare physician fee schedules across ASC, HOPD, and office settings. Higher incentive does not imply improper motives — it means patients should ask their doctor to explain why a particular procedure is recommended for their specific situation. Hover over the symbols for details.
+                <strong>Physician Incentive Scale:</strong> $ = minimal (office visit/Rx only) · $$$$$ = highest per-procedure reimbursement. Based on 2026 Medicare physician fee schedules across ASC, HOPD, and office settings. Higher incentive does not imply improper motives — it means patients should ask their doctor to explain why a particular procedure is recommended for their specific situation. Hover over the symbols for details.<br />
+                <strong>Prostate Size:</strong> Ask your urologist for your prostate volume — it's on your ultrasound or MRI report. Normal is ~25 mL. Many BPH patients are 40–120 mL. Size determines which procedures are eligible for you.<br />
+                <strong>Median Lobe:</strong> An obstructing median lobe is one of the most common anatomical findings in BPH. Some procedures (notably UroLift and TUIP) specifically exclude patients with a median lobe. Ask your doctor if you have one — it significantly narrows your treatment options.
               </div>
             </div>
           </div>
@@ -1031,7 +1156,7 @@ export default function BPHWebsite() {
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {[
                 { icon: "🎯", title: "Our Mission", text: "BPHGuide exists to give men facing BPH treatment decisions the clearest, most honest information available — including data points that aren't always easy to find, like physician reimbursement rates, FDA adverse event reports, and real patient experiences." },
-                { icon: "⚕️", title: "Medical Accuracy", text: "All treatment information is sourced from peer-reviewed clinical trials and official medical guidelines (AUA, EAU). Efficacy data cites specific studies with sample sizes, follow-up periods, and endpoints. We link to PubMed for every major claim. Updated March 2026." },
+                { icon: "⚕️", title: "Medical Accuracy", text: "All treatment information is sourced from peer-reviewed clinical trials and official medical guidelines (AUA, EAU). Efficacy data cites specific studies with sample sizes, follow-up periods, and endpoints. Prostate anatomy suitability (size range, median lobe compatibility) sourced from AUA guidelines and FDA-cleared indications. We link to PubMed for every major claim. 18 treatments covered — updated April 2026." },
                 { icon: "🔒", title: "Independence", text: "We are not affiliated with any pharmaceutical company, device manufacturer, or healthcare system. We do not accept payment to feature or promote any treatment. Aquablation data updated from PROCEPT BioRobotics' 2026 Analyst Day presentation — publicly available investor materials." },
                 { icon: "📋", title: "What BPH Is", text: "Benign prostatic hyperplasia (BPH) is a non-cancerous enlargement of the prostate gland. By age 60, roughly 50% of men have BPH; by age 85, about 90% do. Symptoms include frequent urination, weak stream, urgency, and incomplete emptying. An estimated 40 million U.S. men live with BPH, with approximately 400,000 surgical procedures performed annually." },
               ].map(item => (
@@ -1064,3 +1189,4 @@ export default function BPHWebsite() {
     </div>
   );
 }
+

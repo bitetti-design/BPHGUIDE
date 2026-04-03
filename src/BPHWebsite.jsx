@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import StructuredReviewForm from "./StructuredReviewForm";
 
 /* ─────────────────────────────────────────────
    TREATMENTS DATA — 18 entries across 5 categories
